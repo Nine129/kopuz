@@ -212,6 +212,7 @@ no_more_songs = Tidak ada lagu lagi di antrian
 server_playlist = Playlist Server
 folder_playlists = Folder Playlist
 folder_playlist = Folder
+featured_album = Album Unggulan
 shuffle_on = Acak: Aktif
 shuffle_off = Acak: Nonaktif
 repeat_off = Ulang: Nonaktif
