@@ -1258,28 +1258,11 @@ fn App() -> Element {
                                 }
                             }
                         },
-                        Route::Search => rsx! {
-                            pages::search::Search {
-                                library: library,
-                                config: config,
-                                playlist_store: playlist_store,
-                                search_query: search_query,
-                                player: player,
-                                is_playing: is_playing,
-                                current_playing: current_playing,
-                                current_song_cover_url: current_song_cover_url,
-                                current_song_title: current_song_title,
-                                current_song_artist: current_song_artist,
-                                current_song_duration: current_song_duration,
-                                current_song_progress: current_song_progress,
-                                queue: queue,
-                                current_queue_index: current_queue_index,
-                            }
-                        },
                         Route::Library => rsx! {
                             pages::library::LibraryPage {
                                 library: library,
                                 config: config,
+                                search_query: search_query,
                                 playlist_store: playlist_store,
                                 on_rescan: move |_| *trigger_rescan.write() += 1,
                                 player: player,

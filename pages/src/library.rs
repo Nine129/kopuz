@@ -10,6 +10,7 @@ use crate::server::library::ServerLibrary;
 pub fn LibraryPage(
     library: Signal<Library>,
     config: Signal<AppConfig>,
+    search_query: Signal<String>,
     playlist_store: Signal<reader::PlaylistStore>,
     on_rescan: EventHandler,
     player: Signal<player::Player>,
@@ -37,6 +38,7 @@ pub fn LibraryPage(
             LocalLibrary {
                 library,
                 config,
+                search_query,
                 playlist_store,
                 on_rescan,
                 queue,

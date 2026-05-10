@@ -14,7 +14,6 @@ struct SidebarItem {
 #[cfg(not(target_arch = "wasm32"))]
 const TOP_MENU: &[SidebarItem] = &[
     SidebarItem { key: "home",      route: Route::Home,      icon: "fa-solid fa-house" },
-    SidebarItem { key: "search",    route: Route::Search,    icon: "fa-solid fa-magnifying-glass" },
     SidebarItem { key: "library",   route: Route::Library,   icon: "fa-solid fa-book" },
     SidebarItem { key: "albums",    route: Route::Album,     icon: "fa-solid fa-music" },
     SidebarItem { key: "artists",   route: Route::Artist,    icon: "fa-solid fa-user" },
@@ -27,7 +26,6 @@ const TOP_MENU: &[SidebarItem] = &[
 #[cfg(target_arch = "wasm32")]
 const TOP_MENU: &[SidebarItem] = &[
     SidebarItem { key: "home",      route: Route::Home,      icon: "fa-solid fa-house" },
-    SidebarItem { key: "search",    route: Route::Search,    icon: "fa-solid fa-magnifying-glass" },
     SidebarItem { key: "library",   route: Route::Library,   icon: "fa-solid fa-book" },
     SidebarItem { key: "albums",    route: Route::Album,     icon: "fa-solid fa-music" },
     SidebarItem { key: "artists",   route: Route::Artist,    icon: "fa-solid fa-user" },

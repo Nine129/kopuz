@@ -1,4 +1,5 @@
 use components::playlist_modal::PlaylistModal;
+use components::search_bar::SearchBar;
 use components::selection_bar::SelectionBar;
 use components::stat_card::StatCard;
 use components::track_row::TrackRow;
@@ -17,6 +18,7 @@ const ITEM_HEIGHT: f64 = 60.0; // 60px: p-2 padding (16px*2=32) + content height
 pub fn LocalLibrary(
     library: Signal<Library>,
     config: Signal<AppConfig>,
+    search_query: Signal<String>,
     playlist_store: Signal<reader::PlaylistStore>,
     on_rescan: EventHandler,
     mut queue: Signal<Vec<reader::models::Track>>,
@@ -42,7 +44,22 @@ pub fn LocalLibrary(
     let mut is_selection_mode = use_signal(|| false);
     let mut selected_tracks = use_signal(|| HashSet::<PathBuf>::new());
 
-    let displayed_tracks = use_memo(move || (items.all_tracks)());
+    // Filter tracks by search query (library-wide search bar)
+    let displayed_tracks = use_memo(move || {
+        let query = search_query.read().to_lowercase();
+        let all = (items.all_tracks)();
+        if query.is_empty() {
+            all
+        } else {
+            all.into_iter()
+                .filter(|t| {
+                    t.title.to_lowercase().contains(&query)
+                        || t.artist.to_lowercase().contains(&query)
+                        || t.album.to_lowercase().contains(&query)
+                })
+                .collect()
+        }
+    });
     let album_covers = use_memo(move || (items.album_covers)());
 
     let queue_tracks = use_memo(move || {
@@ -279,6 +296,8 @@ div {
                     }
                 }
             }
+
+            SearchBar { search_query }
 
             div {
                 class: "flex items-center justify-between mb-4",
