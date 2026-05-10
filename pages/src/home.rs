@@ -14,6 +14,11 @@ pub fn Home(
     on_play_album: EventHandler<String>,
     on_select_playlist: EventHandler<String>,
     on_search_artist: EventHandler<String>,
+    on_play_album_now: EventHandler<String>,
+    current_song_title: Signal<String>,
+    current_song_artist: Signal<String>,
+    current_song_cover_url: Signal<String>,
+    is_playing: Signal<bool>,
 ) -> Element {
     let config = use_context::<Signal<AppConfig>>();
     let is_server = config.read().active_source == MusicSource::Server;
@@ -45,6 +50,11 @@ pub fn Home(
                     on_play_album,
                     on_select_playlist,
                     on_search_artist,
+                    on_play_album_now,
+                    current_song_title,
+                    current_song_artist,
+                    current_song_cover_url,
+                    is_playing,
                 }
             }
         }

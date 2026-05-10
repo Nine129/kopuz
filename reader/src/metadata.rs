@@ -53,6 +53,12 @@ pub fn extract_metadata(
 
     let album_title = tag
         .and_then(|t| t.album().map(|a| a.to_string()))
+        .or_else(|| {
+            track_path
+                .parent()
+                .and_then(|p| p.file_name())
+                .map(|n| n.to_string_lossy().into_owned())
+        })
         .unwrap_or_else(|| "Unknown Album".to_string());
 
     let album_artist = tag
@@ -120,18 +126,16 @@ pub fn read(track_path: &Path, cover_cache: &Path, library: &mut Library) -> Opt
     let album_artist = tag
         .and_then(|t| t.get_string(&ItemKey::AlbumArtist))
         .map(|s| s.to_string())
-        .unwrap_or_else(|| track.artist.clone());
+        .unwrap_or_default();
 
     let album_exists = library.albums.iter().any(|a| a.id == album_id);
 
     if !album_exists {
-        let mut cover = None;
-
-        if let Some(bytes) = extract_embedded_cover(tag) {
-            cover = save_cover(&album_id, &bytes, cover_cache).ok();
-        } else if let Some(folder_cover) = find_folder_cover(track_path.parent()?) {
-            cover = Some(folder_cover);
-        }
+        // Prefer folder cover (folder.jpg etc.); otherwise leave None —
+        // a collage of random track covers will be generated post-scan.
+        let cover = track_path
+            .parent()
+            .and_then(find_folder_cover);
 
         let genre = tag
             .and_then(|t| t.genre().map(|g| g.to_string()))

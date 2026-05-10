@@ -1,3 +1,4 @@
+use super::collage::generate_album_collages;
 use super::metadata::read;
 use super::models::Library;
 use std::collections::HashSet;
@@ -66,6 +67,15 @@ pub async fn scan_directory(
                 read(&path, &cover_cache_clone, &mut lib);
             }
             tracing::info!("[scanner] done processing, library now has {} tracks", lib.tracks.len());
+            lib
+        })
+        .await
+        .unwrap();
+
+        // Generate collage covers for albums that lack a folder cover
+        let cover_cache_for_collage = cover_cache.clone();
+        lib = tokio::task::spawn_blocking(move || {
+            generate_album_collages(&mut lib, &cover_cache_for_collage);
             lib
         })
         .await

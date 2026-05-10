@@ -427,7 +427,8 @@ fn App() -> Element {
     #[cfg(not(target_arch = "wasm32"))]
     let _ = std::fs::create_dir_all(cover_cache());
     let download_queue = use_signal(DownloadQueue::default);
-    let mut trigger_rescan = use_signal(|| 0);
+    let mut trigger_rescan = use_signal(|| 0u64);
+    let mut last_rescan_processed = use_signal(|| 0u64);
     let mut scan_current_file = use_signal(|| Option::<String>::None);
     let current_playing = use_signal(|| 0);
     let mut player = use_signal(Player::new);
@@ -934,7 +935,9 @@ fn App() -> Element {
             return;
         }
         let configured_dirs = configured_music_dirs.read().clone();
-        let _ = trigger_rescan.read();
+        let rescan_count = *trigger_rescan.read();
+        let already_processed = *last_rescan_processed.read();
+        let needs_rescan = rescan_count > already_processed;
 
         #[cfg(not(target_arch = "wasm32"))]
         spawn(async move {
@@ -949,7 +952,7 @@ fn App() -> Element {
                 current_lib.root_paths.iter().cloned().collect();
             let new_roots: std::collections::HashSet<_> = configured_dirs.iter().cloned().collect();
 
-            if current_roots != new_roots {
+            if current_roots != new_roots || needs_rescan {
                 current_lib.root_paths = configured_dirs.clone();
                 current_lib.tracks.clear();
                 current_lib.albums.clear();
@@ -1011,6 +1014,11 @@ fn App() -> Element {
                 let _ = current_lib.save(&lib_path());
             }
         });
+
+        // Mark the rescan as processed so it only happens once per click
+        if needs_rescan {
+            *last_rescan_processed.write() = rescan_count;
+        }
     });
 
     use_effect(move || {
@@ -1221,6 +1229,32 @@ fn App() -> Element {
                                 on_search_artist: move |artist: String| {
                                     selected_artist_name.set(artist);
                                     current_route.set(Route::Artist);
+                                },
+                                current_song_title,
+                                current_song_artist,
+                                current_song_cover_url,
+                                is_playing,
+                                on_play_album_now: move |track_path: String| {
+                                    let lib = library.peek();
+                                    let track_path_buf = std::path::PathBuf::from(&track_path);
+                                    if let Some(track) = lib.tracks.iter().find(|t| t.path == track_path_buf) {
+                                        selected_album_id.set(track.album_id.clone());
+                                        let mut album_tracks: Vec<reader::Track> = lib.tracks.iter()
+                                            .filter(|t| t.album_id == track.album_id)
+                                            .cloned()
+                                            .collect();
+                                        album_tracks.sort_by(|a, b| {
+                                            let disc_cmp = a.disc_number.unwrap_or(1).cmp(&b.disc_number.unwrap_or(1));
+                                            if disc_cmp == std::cmp::Ordering::Equal {
+                                                a.track_number.unwrap_or(0).cmp(&b.track_number.unwrap_or(0))
+                                            } else {
+                                                disc_cmp
+                                            }
+                                        });
+                                        let index = album_tracks.iter().position(|t| t.path == track_path_buf).unwrap_or(0);
+                                        queue.set(album_tracks);
+                                        ctrl.play_track(index);
+                                    }
                                 }
                             }
                         },
