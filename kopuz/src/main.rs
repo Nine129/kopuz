@@ -985,6 +985,9 @@ fn App() -> Element {
                     .albums
                     .retain(|a| valid_album_ids.contains(&a.id));
 
+                // Prune orphaned cover files (per-track covers for removed tracks)
+                let _ = reader::prune_cover_cache(&current_lib, &cover_cache());
+
                 library.set(current_lib.clone());
                 let _ = current_lib.save(&lib_path());
             } else {

@@ -11,3 +11,5 @@ pub use metadata::read;
 pub use models::{Album, FavoritesStore, Library, PlaylistFolder, PlaylistStore, Track};
 #[cfg(not(target_arch = "wasm32"))]
 pub use scanner::scan_directory;
+#[cfg(not(target_arch = "wasm32"))]
+pub use utils::prune_cover_cache;
