@@ -4,6 +4,7 @@ use components::stat_card::StatCard;
 use components::track_row::TrackRow;
 use config::AppConfig;
 use dioxus::prelude::*;
+use utils;
 use hooks::use_library_items::use_library_items;
 use hooks::use_player_controller::PlayerController;
 use reader::Library;
@@ -113,7 +114,10 @@ pub fn LocalLibrary(
             let track_key = track.path.display().to_string();
             let is_menu_open = active_menu_track.read().as_ref() == Some(&track.path);
             let is_selected = selected_tracks.read().contains(&track_path);
-            let cover_url = cover_urls.get(&track.album_id).cloned().flatten();
+            // Prefer per-track cover, fall back to album cover
+            let cover_url = track.cover_path.as_ref()
+                .and_then(|cp| utils::format_artwork_url(Some(cp)))
+                .or_else(|| cover_urls.get(&track.album_id).cloned().flatten());
 
             rsx! {
 div {

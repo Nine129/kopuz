@@ -30,6 +30,8 @@ pub struct Track {
     pub playlist_item_id: Option<String>,
     #[serde(default)]
     pub artists: Vec<String>,
+    #[serde(default)]
+    pub cover_path: Option<PathBuf>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default, Clone)]

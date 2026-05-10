@@ -372,11 +372,16 @@ pub fn LocalHome(
                                         .iter()
                                         .find(|t| t.path.to_string_lossy() == track_path)
                                         .and_then(|t| {
-                                            lib.albums
-                                                .iter()
-                                                .find(|a| a.id == t.album_id)
-                                                .and_then(|a| a.cover_path.as_ref())
+                                            // Prefer per-track cover, fall back to album cover
+                                            t.cover_path.as_ref()
                                                 .and_then(|cp| utils::format_artwork_url(Some(cp)))
+                                                .or_else(|| {
+                                                    lib.albums
+                                                        .iter()
+                                                        .find(|a| a.id == t.album_id)
+                                                        .and_then(|a| a.cover_path.as_ref())
+                                                        .and_then(|cp| utils::format_artwork_url(Some(cp)))
+                                                })
                                         })
                                 } else {
                                     None

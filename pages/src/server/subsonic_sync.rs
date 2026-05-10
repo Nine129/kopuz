@@ -142,6 +142,7 @@ pub async fn sync_server_library(
                             artists: item.artists.unwrap_or_else(|| {
                                 item.album_artist.into_iter().collect()
                             }),
+                            cover_path: None,
                         });
                     }
 
@@ -304,6 +305,7 @@ pub async fn fetch_subsonic_library(
                     musicbrainz_release_id: None,
                     playlist_item_id: None,
                     artists: vec![song.artist.unwrap_or_else(|| album_artist.clone())],
+                    cover_path: None,
                 });
             }
         }

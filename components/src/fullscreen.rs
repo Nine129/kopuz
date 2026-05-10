@@ -174,10 +174,15 @@ pub fn Fullscreen(
             }
             None
         } else {
-            lib.albums
-                .iter()
-                .find(|a| a.id == track.album_id)
-                .and_then(|album| utils::format_artwork_url(album.cover_path.as_ref()))
+            // Prefer per-track cover, fall back to album cover
+            track.cover_path.as_ref()
+                .and_then(|p| utils::format_artwork_url(Some(p)))
+                .or_else(|| {
+                    lib.albums
+                        .iter()
+                        .find(|a| a.id == track.album_id)
+                        .and_then(|album| utils::format_artwork_url(album.cover_path.as_ref()))
+                })
         }
     };
 

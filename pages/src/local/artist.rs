@@ -48,11 +48,16 @@ pub fn LocalArtist(
                 .or_insert_with(|| album.cover_path.clone());
         }
         for track in &lib.tracks {
-            let cover = lib
-                .albums
-                .iter()
-                .find(|a| a.id == track.album_id)
-                .and_then(|a| a.cover_path.clone());
+            // Prefer per-track cover over album cover
+            let cover = track
+                .cover_path
+                .clone()
+                .or_else(|| {
+                    lib.albums
+                        .iter()
+                        .find(|a| a.id == track.album_id)
+                        .and_then(|a| a.cover_path.clone())
+                });
             for artist in &track.artists {
                 artist_map.entry(artist.clone()).or_insert_with(|| cover.clone());
             }

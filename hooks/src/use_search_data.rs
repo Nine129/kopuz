@@ -139,10 +139,15 @@ pub fn use_search_data(
                                 .unwrap_or(false)
                     })
                     .map(|t| {
-                        let cover_url = album_map
-                            .get(&t.album_id)
-                            .and_then(|a| a.cover_path.as_ref())
-                            .and_then(|c| utils::format_artwork_url(Some(c)));
+                        // Prefer per-track cover, fall back to album cover
+                        let cover_url = t.cover_path.as_ref()
+                            .and_then(|c| utils::format_artwork_url(Some(c)))
+                            .or_else(|| {
+                                album_map
+                                    .get(&t.album_id)
+                                    .and_then(|a| a.cover_path.as_ref())
+                                    .and_then(|c| utils::format_artwork_url(Some(c)))
+                            });
                         (t.clone(), cover_url)
                     })
                     .collect();

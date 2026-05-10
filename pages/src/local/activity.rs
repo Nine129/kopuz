@@ -77,10 +77,18 @@ pub fn LocalLogs(library: Signal<Library>, config: Signal<AppConfig>) -> Element
                                 .map(|a| a.genre.clone())
                                 .unwrap_or_default();
 
-                            let cover_url = library.read().albums.iter()
-                                .find(|a| a.id == track.album_id)
-                                .and_then(|a| a.cover_path.as_ref())
-                                .and_then(|p| utils::format_artwork_url(Some(p)));
+                            let cover_url = {
+                                let lib = library.read();
+                                // Prefer per-track cover, fall back to album cover
+                                track.cover_path.as_ref()
+                                    .and_then(|p| utils::format_artwork_url(Some(p)))
+                                    .or_else(|| {
+                                        lib.albums.iter()
+                                            .find(|a| a.id == track.album_id)
+                                            .and_then(|a| a.cover_path.as_ref())
+                                            .and_then(|p| utils::format_artwork_url(Some(p)))
+                                    })
+                            };
 
                             rsx! {
                                 div {

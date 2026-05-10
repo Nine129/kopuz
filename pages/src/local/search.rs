@@ -52,10 +52,14 @@ pub fn LocalSearch(
             let mut matching_tracks = Vec::new();
             for track in &lib.tracks {
                 if valid_album_ids.contains(&track.album_id) {
-                    let cover = album_map
-                        .get(&track.album_id)
-                        .and_then(|a| a.cover_path.as_ref())
-                        .and_then(|c| utils::format_artwork_url(Some(c)));
+                    let cover = track.cover_path.as_ref()
+                        .and_then(|c| utils::format_artwork_url(Some(c)))
+                        .or_else(|| {
+                            album_map
+                                .get(&track.album_id)
+                                .and_then(|a| a.cover_path.as_ref())
+                                .and_then(|c| utils::format_artwork_url(Some(c)))
+                        });
                     matching_tracks.push((track.clone(), cover));
                 }
             }

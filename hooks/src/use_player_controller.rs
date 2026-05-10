@@ -109,15 +109,23 @@ impl PlayerController {
                     )
                 })
                 .unwrap_or_default(),
-            _ => self
-                .library
-                .read()
-                .albums
-                .iter()
-                .find(|album| album.id == track.album_id)
-                .and_then(|album| utils::format_artwork_url(album.cover_path.as_ref()))
-                .map(|url| url.as_ref().to_string())
-                .unwrap_or_default(),
+            _ => {
+                // Prefer per-track cover when available
+                if let Some(cover_path) = &track.cover_path {
+                    if let Some(url) = utils::format_artwork_url(Some(cover_path)) {
+                        return url.as_ref().to_string();
+                    }
+                }
+                // Fall back to album cover
+                self.library
+                    .read()
+                    .albums
+                    .iter()
+                    .find(|album| album.id == track.album_id)
+                    .and_then(|album| utils::format_artwork_url(album.cover_path.as_ref()))
+                    .map(|url| url.as_ref().to_string())
+                    .unwrap_or_default()
+            },
         }
     }
 
@@ -678,15 +686,20 @@ impl PlayerController {
                 if let Ok((source, hint)) = decoder::open_file(&track.path) {
                     {
                         let artwork = {
-                            let lib = self.library.peek();
-                            lib.albums
-                                .iter()
-                                .find(|a| a.id == track.album_id)
-                                .and_then(|a| {
-                                    a.cover_path
-                                        .as_ref()
-                                        .map(|p| p.to_string_lossy().into_owned())
-                                })
+                            // Prefer per-track cover, fall back to album cover
+                            if let Some(cover_path) = &track.cover_path {
+                                Some(cover_path.to_string_lossy().into_owned())
+                            } else {
+                                let lib = self.library.peek();
+                                lib.albums
+                                    .iter()
+                                    .find(|a| a.id == track.album_id)
+                                    .and_then(|a| {
+                                        a.cover_path
+                                            .as_ref()
+                                            .map(|p| p.to_string_lossy().into_owned())
+                                    })
+                            }
                         };
 
                         let meta = NowPlayingMeta {

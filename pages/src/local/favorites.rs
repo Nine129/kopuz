@@ -44,7 +44,11 @@ pub fn LocalFavorites(
             .iter()
             .filter(|t| store.is_local_favorite(&t.path))
             .map(|t| {
-                let cover_url = album_covers.get(&t.album_id).cloned().flatten();
+                let cover_url = t.cover_path.as_ref()
+                    .and_then(|cp| utils::format_artwork_url(Some(cp)))
+                    .or_else(|| {
+                        album_covers.get(&t.album_id).cloned().flatten()
+                    });
                 (t.clone(), cover_url)
             })
             .collect()

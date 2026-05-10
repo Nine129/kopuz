@@ -125,6 +125,7 @@ pub fn PlaylistDetail(
                                                 musicbrainz_release_id: None,
                                                 playlist_item_id: item.playlist_item_id,
                                                 artists: item.artists.unwrap_or_default(),
+                                                cover_path: None,
                                             });
                                         }
                                         tracks.set(new_tracks);
@@ -195,6 +196,7 @@ pub fn PlaylistDetail(
                                                 musicbrainz_release_id: None,
                                                 playlist_item_id: None,
                                                 artists: vec![item.artist.unwrap_or_default()],
+                                                cover_path: None,
                                             });
                                         }
                                         tracks.set(new_tracks);

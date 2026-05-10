@@ -183,9 +183,14 @@ pub fn Showcase(props: ShowcaseProps) -> Element {
                                      utils::map_cover_url(url)
                                  } else { None }
                              } else {
-                                 lib.albums.iter()
-                                    .find(|a| a.id == track.album_id)
-                                    .and_then(|a| utils::format_artwork_url(a.cover_path.as_ref()))
+                                 // Prefer per-track cover, fall back to album cover
+                                 track.cover_path.as_ref()
+                                    .and_then(|p| utils::format_artwork_url(Some(p)))
+                                    .or_else(|| {
+                                        lib.albums.iter()
+                                            .find(|a| a.id == track.album_id)
+                                            .and_then(|a| utils::format_artwork_url(a.cover_path.as_ref()))
+                                    })
                              };
 
                              let is_selected = props.selected_tracks.contains(&track.path);

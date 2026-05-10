@@ -1,9 +1,10 @@
 use super::models::{Album, Library, Track};
+
+use std::hash::{Hash, Hasher};
 use super::utils::{find_folder_cover, save_cover};
 use lofty::prelude::*;
 use lofty::tag::ItemKey;
 use lofty::{probe::Probe, properties::FileProperties, tag::Tag};
-use std::fs;
 use std::path::Path;
 
 pub fn make_album_id(album: &str) -> String {
@@ -92,6 +93,7 @@ pub fn extract_metadata(
         disc_number: tag.and_then(|t| t.disk()),
         musicbrainz_release_id,
         playlist_item_id: None,
+        cover_path: None,
     }
 }
 
@@ -102,8 +104,18 @@ pub fn read(track_path: &Path, cover_cache: &Path, library: &mut Library) -> Opt
         .primary_tag()
         .or_else(|| tagged_file.first_tag());
 
-    let track = extract_metadata(tag, properties, track_path);
+    let mut track = extract_metadata(tag, properties, track_path);
     let album_id = track.album_id.clone();
+
+    // Always extract per-track embedded cover, keyed by a hash of the track path
+    if let Some(bytes) = extract_embedded_cover(tag) {
+        let mut hasher = std::collections::hash_map::DefaultHasher::new();
+        track_path.hash(&mut hasher);
+        let path_hash = hasher.finish();
+        let track_cover_name = format!("{}_{:016x}", album_id, path_hash);
+        let track_cover_path = save_cover(&track_cover_name, &bytes, cover_cache).ok();
+        track.cover_path = track_cover_path;
+    }
 
     let album_artist = tag
         .and_then(|t| t.get_string(&ItemKey::AlbumArtist))
