@@ -1,6 +1,7 @@
 use dioxus::prelude::*;
 use rand::seq::SliceRandom;
 use rand::thread_rng;
+use hooks::PlayerController;
 use reader::{FavoritesStore, Library, PlaylistStore};
 use std::path::PathBuf;
 
@@ -122,6 +123,8 @@ pub fn LocalHome(
                         let cover = current_song_cover_url.read().clone();
                         let title = current_song_title.read().clone();
                         let artist = current_song_artist.read().clone();
+                        let mut ctrl = use_context::<PlayerController>();
+                        let now_playing = *ctrl.is_playing.read();
                         rsx! {
                             div { class: "absolute inset-0",
                                 if !cover.is_empty() {
@@ -137,11 +140,15 @@ pub fn LocalHome(
                                 h1 { class: "text-3xl md:text-5xl font-black text-white mb-4 leading-tight max-w-xl break-words", "{title}" }
                                 p { class: "text-base md:text-lg text-white/60 mb-8 font-medium line-clamp-1 max-w-md", "{i18n::t_with(\"by_artist_full\", &[(\"artist\", artist.to_string())])}" }
                                 div { class: "flex items-center gap-4",
-                                    button {
-                                        class: "flex items-center gap-3 bg-white text-black px-8 py-3 rounded-full font-bold hover:bg-white/90 hover:scale-105 active:scale-95 transition-all w-fit",
-                                        onclick: move |_| {},
-                                        i { class: "fa-solid fa-play text-[10px]" }
-                                        span { class: "text-sm", "{i18n::t(\"start_listening\")}" }
+                                    {
+                                        rsx! {
+                                            button {
+                                                class: "flex items-center gap-3 bg-white text-black px-8 py-3 rounded-full font-bold hover:bg-white/90 hover:scale-105 active:scale-95 transition-all w-fit",
+                                                onclick: move |_| ctrl.toggle(),
+                                                i { class: if now_playing { "fa-solid fa-pause text-[10px]" } else { "fa-solid fa-play text-[10px]" } }
+                                                span { class: "text-sm", if now_playing { "{i18n::t(\"pause\")}" } else { "{i18n::t(\"start_listening\")}" } }
+                                            }
+                                        }
                                     }
                                 }
                             }
