@@ -264,7 +264,8 @@ fn main() {
         let mut window = dioxus::desktop::WindowBuilder::new()
             .with_title("Kopuz")
             .with_resizable(true)
-            .with_inner_size(LogicalSize::new(1350.0, 800.0));
+            .with_inner_size(LogicalSize::new(1350.0, 800.0))
+            .with_visible(false);
 
         #[cfg(target_os = "macos")]
         {
@@ -288,6 +289,7 @@ fn main() {
         let config = dioxus::desktop::Config::new()
             .with_data_directory(webview_data_dir)
             .with_window(window)
+            .with_background_color((0, 0, 0, 255))
             .with_custom_protocol("artwork", |_headers, request| {
                 let uri = request.uri();
 
@@ -409,6 +411,17 @@ fn App() -> Element {
     let queue_state_path = use_memo(move || cache_dir().join("queue_state.json"));
     let mut favorites_store = use_signal(FavoritesStore::default);
     let mut initial_load_done = use_signal(|| false);
+
+    #[cfg(not(target_arch = "wasm32"))]
+    use_effect(move || {
+        if *initial_load_done.read() {
+            let desktop = dioxus::desktop::use_window();
+            spawn(async move {
+                tokio::time::sleep(std::time::Duration::from_millis(50)).await;
+                desktop.set_visible(true);
+            });
+        }
+    });
     #[allow(unused_variables)]
     let cover_cache = use_memo(move || cache_dir().join("covers"));
     #[cfg(not(target_arch = "wasm32"))]
