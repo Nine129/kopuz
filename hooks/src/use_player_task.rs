@@ -71,7 +71,7 @@ fn nudge_event_loop() {
     player::systemint::wake_run_loop();
 }
 
-pub fn use_player_task(mut ctrl: PlayerController) {
+pub fn use_player_task(ctrl: PlayerController) {
     #[cfg(not(target_arch = "wasm32"))]
     let presence: Option<Arc<Presence>> = use_context();
     let mut config: Signal<AppConfig> = use_context();
@@ -201,6 +201,7 @@ pub fn use_player_task(mut ctrl: PlayerController) {
         async move {
             let mut last_progress_secs: u64 = u64::MAX;
             let mut prev_playing = false;
+            let mut crossfade_triggered_for_gen: Option<usize> = None;
             #[cfg(not(target_arch = "wasm32"))]
             let bg_notify = BG_NOTIFY.get_or_init(tokio::sync::Notify::new);
             loop {
@@ -228,6 +229,24 @@ pub fn use_player_task(mut ctrl: PlayerController) {
                 #[cfg(not(target_arch = "wasm32"))]
                 let discord_enabled = config.read().discord_presence.unwrap_or(true);
                 let pos = ctrl.player.read().get_position();
+                let mut defer_player_progress = false;
+
+                let pending_crossfade_ui = ctrl.pending_crossfade_ui.read().clone();
+                if let Some(pending) = pending_crossfade_ui {
+                    let crossfade_elapsed_secs = pos.as_secs();
+                    if crossfade_elapsed_secs >= pending.switch_after_secs {
+                        if ctrl.commit_pending_crossfade_ui(crossfade_elapsed_secs) {
+                            last_progress_secs = u64::MAX;
+                        }
+                    } else {
+                        let display_progress = pending
+                            .outgoing_progress_secs
+                            .saturating_add(crossfade_elapsed_secs)
+                            .min(pending.outgoing_duration_secs);
+                        ctrl.current_song_progress.set(display_progress);
+                        defer_player_progress = true;
+                    }
+                }
 
                 let jellyfin_info = {
                     let conf = config.read();
@@ -335,7 +354,8 @@ pub fn use_player_task(mut ctrl: PlayerController) {
                 if is_playing {
                     let duration = *ctrl.current_song_duration.read();
                     let pos_secs = pos.as_secs().min(duration);
-                    if pos_secs != last_progress_secs {
+                    let current_gen = *ctrl.play_generation.read();
+                    if !defer_player_progress && pos_secs != last_progress_secs {
                         last_progress_secs = pos_secs;
                         ctrl.current_song_progress.set(pos_secs);
                     }
@@ -408,6 +428,40 @@ pub fn use_player_task(mut ctrl: PlayerController) {
                         } else if last_discord_enabled {
                             let _ = p.clear_activity();
                         }
+                    }
+
+                    let remaining_secs = duration.saturating_sub(pos_secs);
+                    let should_crossfade = duration > 0
+                        && pos_secs < duration
+                        && ctrl.should_crossfade()
+                        && ctrl.has_next_track()
+                        && remaining_secs <= config.read().crossfade_seconds as u64
+                        && crossfade_triggered_for_gen != Some(current_gen);
+
+                    if should_crossfade
+                        && !*ctrl.is_loading.read()
+                        && !*ctrl.skip_in_progress.read()
+                    {
+                        crossfade_triggered_for_gen = Some(current_gen);
+                        ctrl.skip_in_progress.set(true);
+                        {
+                            let mut config_write = config.write();
+                            let q = ctrl.queue.peek();
+                            let idx = *ctrl.current_queue_index.peek();
+                            if let Some(track) = q.get(idx) {
+                                let track_id = track.path.to_string_lossy().to_string();
+                                *config_write.listen_counts.entry(track_id).or_insert(0) += 1;
+                            }
+                        }
+                        ctrl.play_next_with_crossfade();
+                        nudge_event_loop();
+                        prev_playing = is_playing;
+                        #[cfg(not(target_arch = "wasm32"))]
+                        {
+                            was_playing.set(is_playing);
+                            last_discord_enabled = discord_enabled;
+                        }
+                        continue;
                     }
 
                     let should_skip = ctrl.player.read().is_playback_complete()

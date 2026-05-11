@@ -300,3 +300,6 @@ channel_mode_mono = 单声道
 channel_mode_left_only = 仅左声道
 channel_mode_right_only = 仅右声道
 channel_mode_swap_left_right = 交换左右
+
+crossfade = 交叉淡入淡出
+crossfade_off = 关闭

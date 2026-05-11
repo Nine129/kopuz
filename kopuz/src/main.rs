@@ -852,7 +852,9 @@ fn App() -> Element {
             persisted_volume.set(loaded_volume);
             player.write().set_volume(loaded_volume);
             player.write().set_channel_mode(config.read().channel_mode);
-            player.write().set_equalizer(config.read().equalizer.clone());
+            player
+                .write()
+                .set_equalizer(config.read().equalizer.clone());
             i18n::set_locale(&loaded_language);
 
             if let Some((

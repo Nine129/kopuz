@@ -374,6 +374,30 @@ impl SubsonicClient {
         Ok(url.to_string())
     }
 
+    pub async fn scrobble_now_playing(&self, item_id: &str) -> Result<(), String> {
+        self.call::<EmptyData>(
+            "scrobble.view",
+            vec![
+                ("id".to_string(), item_id.to_string()),
+                ("submission".to_string(), "false".to_string()),
+            ],
+        )
+        .await
+        .map(|_| ())
+    }
+
+    pub async fn scrobble(&self, item_id: &str) -> Result<(), String> {
+        self.call::<EmptyData>(
+            "scrobble.view",
+            vec![
+                ("id".to_string(), item_id.to_string()),
+                ("submission".to_string(), "true".to_string()),
+            ],
+        )
+        .await
+        .map(|_| ())
+    }
+
     pub fn cover_art_url(
         &self,
         cover_art_id: &str,

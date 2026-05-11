@@ -301,3 +301,6 @@ channel_mode_mono = Mono
 channel_mode_left_only = Gauche uniquement
 channel_mode_right_only = Droite uniquement
 channel_mode_swap_left_right = Inverser G/D
+
+crossfade = Fondu enchaîné
+crossfade_off = Désactivé

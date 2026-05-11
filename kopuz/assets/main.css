@@ -51,6 +51,10 @@ body {
     will-change: scroll-position;
 }
 
+#main-scroll-area {
+    contain: layout paint;
+}
+
 body {
     background-color: #000000;
     color: #ffffff;

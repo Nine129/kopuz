@@ -300,3 +300,6 @@ channel_mode_mono = מונו
 channel_mode_left_only = שמאל בלבד
 channel_mode_right_only = ימין בלבד
 channel_mode_swap_left_right = החלף ש/י
+
+crossfade = מעבר הדרגתי
+crossfade_off = כבוי

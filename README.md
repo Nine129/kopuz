@@ -42,6 +42,8 @@ Kopuz allows you to scan your local directories for audio files, or stream from 
 - **Smooth Navigation**: Enjoy a polished interface where scroll positions reset properly as you browse different views and pages.
 - **Reduce Animations**: Accessibility setting to tone down motion effects if you prefer a calmer UI.
 - **Equalizer**: Built-in 5-band equalizer with presets and custom settings to fine-tune your sound.
+- **Crossfade**: Blend track transitions for smoother automatic playback between songs on native desktop builds. Browser playback currently uses normal track switching.
+- **Channel Mode**: Switch between `Stereo`, `Mono`, `Left only`, `Right only`, and `Swap L/R` output modes.
 
 ## Installation
 
@@ -234,4 +236,4 @@ overall these changes brought the rescan time down significantly and the app fee
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=temidaradev/kopuz&type=date&legend=top-left)](https://www.star-history.com/#temidaradev/kopuz&type=date&legend=top-left)
+[![Star History Chart](https://api.star-history.com/chart?repos=Kopuz-org/kopuz&type=date&legend=top-left)](https://www.star-history.com/?repos=Kopuz-org%2Fkopuz&type=date&legend=top-left)

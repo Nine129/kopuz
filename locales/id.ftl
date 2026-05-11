@@ -299,3 +299,6 @@ channel_mode_mono = Mono
 channel_mode_left_only = Hanya kiri
 channel_mode_right_only = Hanya kanan
 channel_mode_swap_left_right = Tukar Kiri/Kanan
+
+crossfade = Crossfade
+crossfade_off = Mati

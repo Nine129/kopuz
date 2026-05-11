@@ -299,3 +299,6 @@ channel_mode_mono = Mono
 channel_mode_left_only = Apenas esquerda
 channel_mode_right_only = Apenas direita
 channel_mode_swap_left_right = Inverter E/D
+
+crossfade = Transição Contínua
+crossfade_off = Desligado

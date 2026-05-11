@@ -300,3 +300,6 @@ channel_mode_mono = Monó
 channel_mode_left_only = Csak bal
 channel_mode_right_only = Csak jobb
 channel_mode_swap_left_right = B/J felcserélése
+
+crossfade = Áttűnés
+crossfade_off = Ki
