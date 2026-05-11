@@ -439,6 +439,8 @@ pub struct AppConfig {
     pub sidebar_order: Vec<String>,
     #[serde(default = "default_volume")]
     pub volume: f32,
+    #[serde(default = "default_crossfade_seconds")]
+    pub crossfade_seconds: u8,
     #[serde(default)]
     pub custom_themes: HashMap<String, CustomTheme>,
     #[serde(default)]
@@ -532,6 +534,10 @@ fn default_volume() -> f32 {
     1.0
 }
 
+fn default_crossfade_seconds() -> u8 {
+    0
+}
+
 fn default_language() -> String {
     "en".to_string()
 }
@@ -575,6 +581,7 @@ impl Default for AppConfig {
             show_source_toggle: default_show_source_toggle(),
             sidebar_order: default_sidebar_order(),
             volume: default_volume(),
+            crossfade_seconds: default_crossfade_seconds(),
             custom_themes: HashMap::new(),
             back_behavior: BackBehavior::RewindThenPrev,
             channel_mode: ChannelMode::Stereo,

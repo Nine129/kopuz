@@ -306,3 +306,6 @@ channel_mode_mono = أحادي
 channel_mode_left_only = الأيسر فقط
 channel_mode_right_only = الأيمن فقط
 channel_mode_swap_left_right = تبديل اليسار/اليمين
+
+crossfade = تلاشي متقاطع
+crossfade_off = إيقاف

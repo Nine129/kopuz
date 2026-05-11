@@ -300,3 +300,6 @@ channel_mode_mono = Mono
 channel_mode_left_only = Doar stânga
 channel_mode_right_only = Doar dreapta
 channel_mode_swap_left_right = Inversare S/D
+
+crossfade = Întrepătrundere
+crossfade_off = Oprit

@@ -300,3 +300,6 @@ channel_mode_mono = Моно
 channel_mode_left_only = Лише лівий
 channel_mode_right_only = Лише правий
 channel_mode_swap_left_right = Поміняти Л/П
+
+crossfade = Кросфейд
+crossfade_off = Вимкнено

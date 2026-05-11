@@ -46,6 +46,9 @@ urlencoding = "2.1.3"
 reqwest = { workspace = true }
 
 
+[target.'cfg(target_os = "linux")'.dependencies]
+webkit2gtk = { version = "2.0", features = ["v2_16"] }
+
 [target.'cfg(target_os = "macos")'.dependencies]
 objc2 = { version = "0.6.3", features = ["std"] }
 objc2-foundation = { version = "0.3.2", features = [

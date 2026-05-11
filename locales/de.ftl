@@ -300,3 +300,6 @@ channel_mode_mono = Mono
 channel_mode_left_only = Nur links
 channel_mode_right_only = Nur rechts
 channel_mode_swap_left_right = L/R tauschen
+
+crossfade = Überblendung
+crossfade_off = Aus

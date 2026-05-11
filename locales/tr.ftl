@@ -300,3 +300,6 @@ channel_mode_mono = Mono
 channel_mode_left_only = Sadece sol
 channel_mode_right_only = Sadece sağ
 channel_mode_swap_left_right = Sol/Sağ Değiştir
+
+crossfade = Çapraz Geçiş
+crossfade_off = Kapalı

@@ -13,6 +13,11 @@ use hooks::use_player_controller::PlayerController;
 #[component]
 pub fn Settings(config: Signal<AppConfig>) -> Element {
     let mut ctrl = use_context::<PlayerController>();
+    let crossfade_label = if config.read().crossfade_seconds == 0 {
+        i18n::t("crossfade_off")
+    } else {
+        format!("{}s", config.read().crossfade_seconds)
+    };
     let mut show_add_server = use_signal(|| false);
     let mut show_login = use_signal(|| false);
 
@@ -298,6 +303,31 @@ pub fn Settings(config: Signal<AppConfig>) -> Element {
                     }
 
                     div { class: "space-y-4",
+                        SettingItem {
+                            title: i18n::t("crossfade").to_string(),
+                            control: rsx! {
+                                div { class: "flex items-center gap-3 min-w-[220px]",
+                                    input {
+                                        r#type: "range",
+                                        min: "0",
+                                        max: "12",
+                                        step: "1",
+                                        value: format!("{}", config.read().crossfade_seconds),
+                                        class: "w-40",
+                                        style: "accent-color: var(--color-indigo-500);",
+                                        oninput: move |evt| {
+                                            if let Ok(value) = evt.value().parse::<u8>() {
+                                                config.write().crossfade_seconds = value.min(12);
+                                            }
+                                        }
+                                    }
+                                    span {
+                                        class: "text-xs font-mono text-white/80 w-16 text-right",
+                                        "{crossfade_label}"
+                                    }
+                                }
+                            }
+                        }
                         SettingItem {
                             title: i18n::t("channel_mode").to_string(),
                             control: rsx! {

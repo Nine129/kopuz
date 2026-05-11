@@ -301,3 +301,6 @@ channel_mode_mono = 󱤴 󱥯
 channel_mode_left_only = 󱥭 󱤿 󱥔
 channel_mode_right_only = 󱥭 󱥬 󱥔
 channel_mode_swap_left_right = 󱤴 󱥭
+
+crossfade = 󱥭 󱤴
+crossfade_off = 󱤄

@@ -301,3 +301,6 @@ channel_mode_mono = Mono
 channel_mode_left_only = Solo izquierdo
 channel_mode_right_only = Solo derecho
 channel_mode_swap_left_right = Intercambiar I/D
+
+crossfade = Fundido cruzado
+crossfade_off = Apagado
